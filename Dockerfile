@@ -14,7 +14,7 @@ RUN cd /code-server && npm run release
 RUN cd /code-server && npm run release:standalone
 
 
-FROM alpine:latest as base
+FROM alpine:latest AS base
 RUN apk update && \
     apk upgrade
 RUN apk add libstdc++
