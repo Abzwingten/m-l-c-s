@@ -42,12 +42,6 @@ RUN apk add --no-cache build-base ncurses-dev && \
 FROM base AS guile
 RUN apk add --no-cache guile
 
-FROM base AS mal
-RUN apk add --no-cache rust cargo && \
-    git clone https://github.com/kanaka/mal && \
-    cd mal && \
-    make MAL_IMPL=rust && \
-    cp rust/target/release/mal /usr/bin/mal
 
 FROM base AS final
 COPY --from=sbcl /root/quicklisp /root/quicklisp
@@ -56,7 +50,6 @@ COPY --from=chicken /usr/local/lib/chicken /usr/local/lib/chicken
 COPY --from=chicken /usr/bin/csi /usr/bin/csi
 COPY --from=chez /usr/bin/scheme /usr/bin/scheme
 COPY --from=guile /usr/bin/guile /usr/bin/guile
-COPY --from=mal /usr/bin/mal /usr/bin/mal
 
 RUN code-server --install-extension alanz.commonlisp-vscode && \
     code-server --install-extension sjhuangx.vscode-scheme
