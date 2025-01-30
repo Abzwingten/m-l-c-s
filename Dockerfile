@@ -12,7 +12,8 @@ RUN apk add --no-cache \
     automake \
     libtool \
     pkgconf \
-    build-base
+    build-base \
+    sudo
 RUN apk add alpine-sdk bash libc6-compat krb5-dev
 RUN apk add npm
 
