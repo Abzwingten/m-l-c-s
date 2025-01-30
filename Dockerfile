@@ -60,16 +60,16 @@ COPY --from=sbcl /root/quicklisp /root/quicklisp
 COPY --from=sbcl /usr/bin/sbcl /usr/bin/sbcl
 COPY --from=chez /usr/bin/scheme /usr/bin/scheme
 COPY --from=guile /usr/bin/guile /usr/bin/guile
-COPY --from=code-builder /code-server/release-standalone /usr/bin/code-server
+COPY --from=code-builder /code-server/release-standalone /opt/code-server
 
 
-RUN code-server --install-extension alanz.commonlisp-vscode && \
-    code-server --install-extension sjhuangx.vscode-scheme
+RUN /opt/code-server --install-extension alanz.commonlisp-vscode && \
+    /opt/code-server --install-extension sjhuangx.vscode-scheme
 
 RUN apk del gcc musl-dev build-base ncurses-dev rust cargo git make && \
     rm -rf /var/cache/apk/*
     
 
 # Configure Workspace
-WORKDIR /app
-CMD ["code-server", "--auth", "none", "--bind-addr", "0.0.0.0:8080"]
+# WORKDIR /app
+CMD ["/opt/code-server", "--auth", "none", "--bind-addr", "0.0.0.0:8080"]
