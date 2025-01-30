@@ -14,10 +14,10 @@ RUN apk add --no-cache \
     libtool \
     pkgconf \
     build-base
+RUN apk add alpine-sdk bash libc6-compat krb5-dev
 
 ENV PYTHON=/usr/bin/python3
 RUN npm install -g node-gyp
-
 RUN npm install -g code-server
 FROM base AS sbcl
 RUN apk add --no-cache sbcl && \
