@@ -18,7 +18,7 @@ RUN apk add npm
 
 ENV PYTHON=/usr/bin/python3
 RUN npm install -g node-gyp
-RUN npm install -g code-server@4.12.0
+RUN npm install  --unsafe-perm -g code-server@4.12.0
 FROM base AS sbcl
 RUN apk add --no-cache sbcl && \
     curl -O https://beta.quicklisp.org/quicklisp.lisp && \
