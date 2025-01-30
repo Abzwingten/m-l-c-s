@@ -16,8 +16,23 @@ RUN cd /code-server && npm run release:standalone
 
 FROM alpine:latest AS base
 RUN apk update && \
-    apk upgrade
-RUN apk add libstdc++
+    apk upgrade && \
+    apk add --no-cache \
+    git \
+    curl \
+    make \
+    gcc \
+    g++ \
+    python3 \
+    libstdc++ \
+    linux-headers \
+    autoconf \
+    automake \
+    libtool \
+    pkgconf \
+    build-base \
+    sudo 
+
 
 
 FROM base AS sbcl
