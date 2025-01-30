@@ -1,8 +1,7 @@
-FROM alpine:latest AS base
+FROM node:16-alpine AS base
+
 RUN apk add --no-cache \
     git \
-    nodejs \
-    npm \
     curl \
     make \
     gcc \
@@ -14,11 +13,12 @@ RUN apk add --no-cache \
     automake \
     libtool \
     pkgconf \
-    && ln -sf python3 /usr/bin/python \
-    && npm install -g node-gyp \
-    && npm install -g node-addon-api
-RUN npm install -g code-server
+    build-base
 
+ENV PYTHON=/usr/bin/python3
+RUN npm install -g node-gyp
+
+RUN npm install -g code-server
 FROM base AS sbcl
 RUN apk add --no-cache sbcl && \
     curl -O https://beta.quicklisp.org/quicklisp.lisp && \
