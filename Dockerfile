@@ -13,7 +13,8 @@ RUN apk add --no-cache \
     libtool \
     pkgconf \
     build-base \
-    sudo
+    sudo \
+    xorg-dev
 RUN apk add alpine-sdk bash libc6-compat krb5-dev
 RUN apk add npm
 
