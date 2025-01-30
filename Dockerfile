@@ -1,5 +1,4 @@
-FROM alpine:latest AS base
-
+FROM node:16-alpine AS base
 RUN apk add --no-cache \
     git \
     curl \
@@ -15,7 +14,7 @@ RUN apk add --no-cache \
     pkgconf \
     build-base
 RUN apk add alpine-sdk bash libc6-compat krb5-dev
-RUN apk add nodejs-current && apk add npm
+RUN apk add npm
 
 ENV PYTHON=/usr/bin/python3
 RUN npm install -g node-gyp
