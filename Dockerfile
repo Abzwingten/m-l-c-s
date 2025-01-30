@@ -14,7 +14,9 @@ RUN apk add --no-cache \
     automake \
     libtool \
     pkgconf \
-    && ln -sf python3 /usr/bin/python
+    && ln -sf python3 /usr/bin/python \
+    && npm install -g node-gyp \
+    && npm install -g node-addon-api
 RUN npm install -g code-server
 
 FROM base AS sbcl
