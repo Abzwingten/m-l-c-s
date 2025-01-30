@@ -28,10 +28,6 @@ RUN apk add --no-cache sbcl && \
          --eval '(ql:add-to-init-file)' \
          --eval '(quit)'
 
-FROM base AS chicken
-RUN apk add --no-cache chicken && \
-    chicken-install -s r7rs srfi-1 srfi-13
-
 FROM base AS chez
 RUN apk add --no-cache build-base ncurses-dev && \
     git clone https://github.com/cisco/ChezScheme && \
@@ -47,8 +43,6 @@ RUN apk add --no-cache guile
 FROM base AS final
 COPY --from=sbcl /root/quicklisp /root/quicklisp
 COPY --from=sbcl /usr/bin/sbcl /usr/bin/sbcl
-COPY --from=chicken /usr/local/lib/chicken /usr/local/lib/chicken
-COPY --from=chicken /usr/bin/csi /usr/bin/csi
 COPY --from=chez /usr/bin/scheme /usr/bin/scheme
 COPY --from=guile /usr/bin/guile /usr/bin/guile
 
