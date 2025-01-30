@@ -1,5 +1,20 @@
 FROM alpine:latest AS base
-RUN apk add --no-cache git nodejs npm curl make gcc musl-dev python3 && ln -sf python3 /usr/bin/python
+RUN apk add --no-cache \
+    git \
+    nodejs \
+    npm \
+    curl \
+    make \
+    gcc \
+    g++ \
+    python3 \
+    libstdc++ \
+    linux-headers \
+    autoconf \
+    automake \
+    libtool \
+    pkgconf \
+    && ln -sf python3 /usr/bin/python
 RUN npm install -g code-server
 
 FROM base AS sbcl
