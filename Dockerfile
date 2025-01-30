@@ -18,7 +18,7 @@ RUN apk add alpine-sdk bash libc6-compat krb5-dev
 RUN apk add npm
 
 ENV PYTHON=/usr/bin/python3
-RUN npm install -g node-gyp  minimist yauzl
+RUN npm install -g node-gyp  minimist yauzl yazl @microsoft/1ds-core-js
 RUN npm install  --unsafe-perm -g code-server@4.12.0
 FROM base AS sbcl
 RUN apk add --no-cache sbcl && \
