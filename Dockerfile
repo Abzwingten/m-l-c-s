@@ -1,6 +1,6 @@
 FROM alpine:latest AS base
-RUN apk add --no-cache git nodejs npm curl make gcc musl-dev && \
-    npm install -g code-server
+RUN apk add --no-cache git nodejs npm curl make gcc musl-dev 
+RUN npm install -g code-server
 
 FROM base AS sbcl
 RUN apk add --no-cache sbcl && \
