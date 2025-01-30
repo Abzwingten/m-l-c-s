@@ -33,7 +33,7 @@ FROM base AS chez
 RUN apk add --no-cache build-base ncurses-dev && \
     git clone https://github.com/cisco/ChezScheme && \
     cd ChezScheme && \
-    ./configure --prefix=/usr && \
+    ./configure --prefix=/usr --disable-x11 && \
     make -j$(nproc) && \
     make install
 
