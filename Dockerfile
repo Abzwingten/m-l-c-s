@@ -62,7 +62,7 @@ COPY --from=chez /usr/bin/scheme /usr/bin/scheme
 COPY --from=guile /usr/bin/guile /usr/bin/guile
 COPY --from=code-builder /code-server/release-standalone /opt/code-server
 
-
+RUN chmod +x /opt/code-server
 RUN /opt/code-server --install-extension alanz.commonlisp-vscode && \
     /opt/code-server --install-extension sjhuangx.vscode-scheme
 
