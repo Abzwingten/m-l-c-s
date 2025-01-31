@@ -1,41 +1,57 @@
-FROM node:20-alpine AS code-builder
-RUN apk update && \
-    apk upgrade
-RUN apk add bash git alpine-sdk quilt krb5-dev libx11-dev \
-      libxkbfile-dev libstdc++ libc6-compat libsecret-dev jq rsync
-RUN git clone --recurse-submodules --shallow-submodules   \
-      --depth 1 https://github.com/coder/code-server.git  \
-      /code-server
-RUN cd /code-server && quilt push -a
-RUN cd /code-server && npm install
-RUN cd /code-server && npm run build
-RUN cd /code-server && VERSION='0.0.0' npm run build:vscode
-RUN cd /code-server && npm run release
-RUN cd /code-server && npm run release:standalone
+FROM jeanblanchard/alpine-glibc:3.19
+
+ENV \
+   # container/su-exec UID \
+   EUID=1001 \
+   # container/su-exec GID \
+   EGID=1001 \
+   # container/su-exec user name \
+   EUSER=vscode \
+   # container/su-exec group name \
+   EGROUP=vscode \
+   # should user shell set to nologin? (yes/no) \
+   ENOLOGIN=no \
+   # container user home dir \
+   EHOME=/home/vscode \
+   # code-server version \
+   VERSION=4.96.4
+
+COPY code-server /usr/bin/
+RUN chmod +x /usr/bin/code-server
+
+# Install dependencies
+RUN \
+   apk --no-cache --update add \
+   bash \
+   curl \
+   git \
+   gnupg \
+   nodejs \
+   openssh-client \
+   make \
+   gcc \
+   g++ \
+   python3 \
+   libstdc++ \
+   linux-headers \
+   autoconf \
+   automake \
+   libtool \
+   pkgconf \
+   build-base \
+   sudo 
+
+RUN \
+   wget https://github.com/cdr/code-server/releases/download/v$VERSION/code-server-$VERSION-linux-amd64.tar.gz && \
+   tar x -zf code-server-$VERSION-linux-amd64.tar.gz && \
+   rm code-server-$VERSION-linux-amd64.tar.gz && \
+   rm code-server-$VERSION-linux-amd64/node && \
+   rm code-server-$VERSION-linux-amd64/code-server && \
+   rm code-server-$VERSION-linux-amd64/lib/node && \
+   mv code-server-$VERSION-linux-amd64 /usr/lib/code-server && \
+   sed -i 's/"$ROOT\/lib\/node"/node/g'  /usr/lib/code-server/bin/code-server
 
 
-FROM alpine:latest AS base
-RUN apk update && \
-    apk upgrade && \
-    apk add --no-cache \
-    git \
-    curl \
-    make \
-    gcc \
-    g++ \
-    python3 \
-    libstdc++ \
-    linux-headers \
-    autoconf \
-    automake \
-    libtool \
-    pkgconf \
-    build-base \
-    sudo 
-
-
-
-FROM base AS sbcl
 RUN apk add --no-cache sbcl && \
     curl -O https://beta.quicklisp.org/quicklisp.lisp && \
     sbcl --load quicklisp.lisp \
@@ -43,7 +59,6 @@ RUN apk add --no-cache sbcl && \
          --eval '(ql:add-to-init-file)' \
          --eval '(quit)'
 
-FROM base AS chez
 RUN apk add --no-cache build-base ncurses-dev && \
     git clone https://github.com/cisco/ChezScheme && \
     cd ChezScheme && \
@@ -51,25 +66,12 @@ RUN apk add --no-cache build-base ncurses-dev && \
     make -j$(nproc) && \
     make install
 
-FROM base AS guile
 RUN apk add --no-cache guile
+RUN  /usr/bin/code-server --install-extension alanz.commonlisp-vscode && \
+     /usr/bin/code-server --install-extension sjhuangx.vscode-scheme
 
 
-FROM base AS final
-COPY --from=sbcl /root/quicklisp /root/quicklisp
-COPY --from=sbcl /usr/bin/sbcl /usr/bin/sbcl
-COPY --from=chez /usr/bin/scheme /usr/bin/scheme
-COPY --from=guile /usr/bin/guile /usr/bin/guile
-COPY --from=code-builder /code-server/release-standalone /opt/code-server
 
-RUN chmod +x /opt/code-server
-RUN /opt/code-server --install-extension alanz.commonlisp-vscode && \
-    /opt/code-server --install-extension sjhuangx.vscode-scheme
+ENTRYPOINT ["entrypoint-su-exec", "code-server"]
+CMD ["--bind-addr 0.0.0.0:8080"]
 
-RUN apk del gcc musl-dev build-base ncurses-dev rust cargo git make && \
-    rm -rf /var/cache/apk/*
-    
-
-# Configure Workspace
-# WORKDIR /app
-CMD ["/opt/code-server", "--auth", "none", "--bind-addr", "0.0.0.0:8080"]
